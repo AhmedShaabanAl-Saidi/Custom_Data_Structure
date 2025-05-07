@@ -1,6 +1,8 @@
-﻿namespace Custom_Data_Structures
+﻿using System.Collections;
+
+namespace Custom_Data_Structures
 {
-    public class MyList<T>
+    public class MyList<T> : IEnumerable<T>
     {
         // Properties
         #region Properties
@@ -302,6 +304,17 @@
             {
                 items[i] = default(T);
             }
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            foreach (T item in items)
+               yield return item;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
         #endregion
         #endregion
