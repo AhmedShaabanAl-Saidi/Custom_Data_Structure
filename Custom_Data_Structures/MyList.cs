@@ -7,6 +7,7 @@ namespace Custom_Data_Structures
         // Properties
         #region Properties
         T[] items;
+        Stack<T> stack;
         public int Count { get; set; }
 
         public bool IsReadOnly => false;
@@ -21,6 +22,7 @@ namespace Custom_Data_Structures
         public MyList()
         {
             items = new T[capacty];
+            stack = new Stack<T>();
             Count = 0;
             currentIndex = 0;
             equalityComparer = EqualityComparer<T>.Default;
@@ -29,6 +31,7 @@ namespace Custom_Data_Structures
         public MyList(IEqualityComparer<T> comparer)
         {
             items = new T[capacty];
+            stack = new Stack<T>();
             Count = 0;
             currentIndex = 0;
             equalityComparer = comparer;
@@ -37,6 +40,7 @@ namespace Custom_Data_Structures
         public MyList(int capacty)
         {
             items = new T[capacty];
+            stack = new Stack<T>();
             Count = 0;
             currentIndex = 0;
             equalityComparer = EqualityComparer<T>.Default;
@@ -47,8 +51,9 @@ namespace Custom_Data_Structures
             int count = GetEnumrableCount(collection);
 
             items = new T[count];
+            stack = new Stack<T>();
 
-            foreach(T item in collection)
+            foreach (T item in collection)
                 Add(item);
 
             equalityComparer = EqualityComparer<T>.Default;
@@ -214,6 +219,9 @@ namespace Custom_Data_Structures
 
             for (int i = start + count; i < items.Length; i++)
             {
+                // Add the item to the stack during removal
+                stack.Push(items[start]);
+
                 items[start] = items[i];
                 start++;
             }
@@ -261,7 +269,7 @@ namespace Custom_Data_Structures
         }
         #endregion
 
-        // Reversing and Sorting Methods
+        // Reversing , Sorting Methods , Undo Methods
         #region Reversing and Sorting Methods
         public T[] ToArray()
         {
@@ -284,6 +292,24 @@ namespace Custom_Data_Structures
         {
             Array.Sort(items);
         }
+
+        public void Undo()
+        {
+            if (stack.Count > 0)
+            {
+                T item = stack.Pop();
+                Add(item);
+            }
+        }
+
+        public void UndoAll()
+        {
+            while (stack.Count > 0)
+            {
+                T item = stack.Pop();
+                Add(item);
+            }
+        }
         #endregion
 
         // Helper Methods
@@ -299,6 +325,9 @@ namespace Custom_Data_Structures
 
         private void ShiftLift(int index)
         {
+            // Add the item to the stack
+            stack.Push(items[index]);
+
             for (int i = index; i < items.Length - 1; i++)
             {
                 if (items[i] == null)
