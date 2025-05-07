@@ -2,12 +2,15 @@
 
 namespace Custom_Data_Structures
 {
-    public class MyList<T> : IEnumerable<T>
+    public class MyList<T> : IEnumerable<T> , ICollection<T> , IList<T>
     {
         // Properties
         #region Properties
         T[] items;
         public int Count { get; set; }
+
+        public bool IsReadOnly => throw new NotImplementedException();
+
         int currentIndex;
         const int capacty = 4;
         IEqualityComparer<T> equalityComparer;
@@ -178,14 +181,16 @@ namespace Custom_Data_Structures
             Count--;
         }
 
-        public void Remove(T item)
+        public bool Remove(T item)
         {
-            int index = Indexof(item);
+            int index = IndexOf(item);
 
             ShiftLift(index);
 
             currentIndex--;
             Count--;
+
+            return true;
         }
 
         public void RemoveRange(int start, int count)
@@ -230,7 +235,7 @@ namespace Custom_Data_Structures
 
         // Searching Methods
         #region Searching Methods
-        public int Indexof(T item)
+        public int IndexOf(T item)
         {
             for (int i = 0; i < items.Length; i++)
             {
@@ -315,6 +320,16 @@ namespace Custom_Data_Structures
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public bool Contains(T item)
+        {
+            return IndexOf(item) > -1;
+        }
+
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            Array.Copy(items, 0, array, arrayIndex, Count);
         }
         #endregion
         #endregion
