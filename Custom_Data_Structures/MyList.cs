@@ -166,21 +166,19 @@ namespace Custom_Data_Structures
         {
             int count = GetEnumrableCount(newItems);
 
-            // Check if the index is valid
-            if (index < 0 || index >= Count)
+            if (index < 0 || index > Count)
                 throw new IndexOutOfRangeException("Index was outside the bounds of the array.");
 
-            // Check if the list is full and needs to be resized
             if (Count + count > items.Length)
                 Resize(Count + count);
 
-            // Shift elements to the right to make space for the new items
             ShiftRight(index, count);
 
-            // Insert the new items at the specified index
+            int i = index;
+
             foreach (var item in newItems)
             {
-                items[index + 1] = item;
+                items[i++] = item;
                 currentIndex++;
                 Count++;
             }
@@ -194,8 +192,8 @@ namespace Custom_Data_Structures
             if (index < 0 || index >= currentIndex)
                 throw new IndexOutOfRangeException("Index was outside the bounds of the array.");
 
-            ShiftLift(index);
-
+            stack.Push(items[index]); // Push the removed item to the stack
+            ShiftLift(index); // Shift elements left
             currentIndex--;
             Count--;
         }
@@ -204,8 +202,11 @@ namespace Custom_Data_Structures
         {
             int index = IndexOf(item);
 
-            ShiftLift(index);
+            if (index == -1)
+                return false;
 
+            stack.Push(items[index]); 
+            ShiftLift(index);
             currentIndex--;
             Count--;
 
@@ -325,6 +326,9 @@ namespace Custom_Data_Structures
 
         private void ShiftLift(int index)
         {
+            if (index < 0 || index >= Count)
+                throw new IndexOutOfRangeException("Index was outside the bounds of the array.");
+
             // Add the item to the stack
             stack.Push(items[index]);
 
