@@ -9,7 +9,7 @@ namespace Custom_Data_Structures
         T[] items;
         public int Count { get; set; }
 
-        public bool IsReadOnly => throw new NotImplementedException();
+        public bool IsReadOnly => false;
 
         int currentIndex;
         const int capacty = 4;
@@ -39,6 +39,18 @@ namespace Custom_Data_Structures
             items = new T[capacty];
             Count = 0;
             currentIndex = 0;
+            equalityComparer = EqualityComparer<T>.Default;
+        }
+
+        public MyList(IEnumerable<T> collection)
+        {
+            int count = GetEnumrableCount(collection);
+
+            items = new T[count];
+
+            foreach(T item in collection)
+                Add(item);
+
             equalityComparer = EqualityComparer<T>.Default;
         }
         #endregion
@@ -109,14 +121,16 @@ namespace Custom_Data_Structures
             Count++;
         }
 
-        public void AddRange(T[] newItems)
+        public void AddRange(IEnumerable<T> newItems)
         {
-            if (items.Length < Count + newItems.Length)
-                Resize(Count + newItems.Length);
+            int count = GetEnumrableCount(newItems);
 
-            for (int i = 0; i < newItems.Length; i++)
+            if (items.Length < Count + count)
+                Resize(Count + count);
+
+            foreach (var item in newItems)
             {
-                items[currentIndex] = newItems[i];
+                items[currentIndex] = item;
                 currentIndex++;
                 Count++;
             }
@@ -143,28 +157,28 @@ namespace Custom_Data_Structures
             Count++;
         }
 
-        public void InsertRange(int index, T[] newItems)
+        public void InsertRange(int index, IEnumerable<T> newItems)
         {
+            int count = GetEnumrableCount(newItems);
+
             // Check if the index is valid
             if (index < 0 || index >= Count)
                 throw new IndexOutOfRangeException("Index was outside the bounds of the array.");
 
             // Check if the list is full and needs to be resized
-            if (Count + newItems.Length > items.Length)
-                Resize(Count + newItems.Length);
+            if (Count + count > items.Length)
+                Resize(Count + count);
 
             // Shift elements to the right to make space for the new items
-            ShiftRight(index, newItems.Length);
+            ShiftRight(index, count);
 
             // Insert the new items at the specified index
-            for (int i = 0; i < newItems.Length; i++)
+            foreach (var item in newItems)
             {
-                items[index + i] = newItems[i];
+                items[index + 1] = item;
+                currentIndex++;
+                Count++;
             }
-
-            // Update the current index and count
-            currentIndex += newItems.Length;
-            Count += newItems.Length;
         }
         #endregion
 
@@ -309,6 +323,15 @@ namespace Custom_Data_Structures
             {
                 items[i] = default(T);
             }
+        }
+
+        private int GetEnumrableCount(IEnumerable<T> collection)
+        {
+            int count = 0;
+            foreach (var item in collection)
+                count++;
+
+            return count;
         }
 
         public IEnumerator<T> GetEnumerator()
